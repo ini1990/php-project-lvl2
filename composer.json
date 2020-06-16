@@ -1,0 +1,20 @@
+{
+    "name": "ini1990/php-project-lvl2",
+    "authors": [
+        {
+            "name": "ini1990",
+            "email": "ini1990g@gmail.com"
+        }
+    ],
+    "require": {
+        "docopt/docopt": "^1.0"
+    },
+    "autoload": {
+        "files": [
+          "src/cli.php"
+        ]
+    },
+    "bin": [
+        "bin/gendiff"
+    ]
+}
