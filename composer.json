@@ -11,7 +11,9 @@
     },
     "autoload": {
         "files": [
-          "src/cli.php"
+          "src/diff.php",
+          "src/decoder.php",
+          "src/renderer.php"
         ]
     },
     "bin": [
