@@ -5,23 +5,42 @@ namespace Differ\diff;
 function genDiff($file1, $file2, $format = 'pretty')
 {
     [$arr1, $arr2] = [\Differ\decoder\decode($file1), \Differ\decoder\decode($file2)];
-    $arr = array_merge(getItems($arr1, $arr2, ' '), getItems($arr1, $arr2, '-'), getItems($arr2, $arr1, '+'));
-    return \Differ\renderer\rend(sortKey($arr));
+    $arr = buildAst($arr1, $arr2);
+    return \Differ\renderer\rend($arr);
 }
 
-function getItems($arr1, $arr2, $v)
+function buildAst($data1, $data2)
 {
-    $arr = ($v === ' ') ? array_intersect_assoc($arr1, $arr2) : array_diff_assoc($arr1, $arr2);
-    return addPrefix($arr, $v);
+    $allKeys = array_unique(array_keys((array)$data1 + (array) $data2));
+    $addDescriptionTree = array_map(function ($key) use ($data1, $data2) {
+        $newValue = $data2->$key ?? '';
+        $oldValue = $data1->$key ?? '';
+        if (!property_exists($data1, $key)) {
+            return makeNode($key, 'added', $newValue, $oldValue);
+        }
+        if (!property_exists($data2, $key)) {
+            return makeNode($key, 'deleted', $newValue, $oldValue);
+        }
+        if (is_object($oldValue) && is_object($newValue)) {
+            $children = buildAst($oldValue, $newValue);
+            return makeNode($key, 'nested', $newValue, $oldValue, $children);
+        }
+        if ($oldValue === $newValue) {
+            return makeNode($key, 'unchanged', $newValue, $oldValue);
+        } else {
+            return makeNode($key, 'changed', $newValue, $oldValue);
+        }
+    }, $allKeys);
+    return $addDescriptionTree;
 }
 
-function addPrefix($arr, $p)
+function makeNode($key, $type, $newValue, $oldValue = null, $children = null)
 {
-    return array_combine(array_map(fn($key) => " {$p} {$key}", array_keys($arr)), array_values($arr));
-}
-
-function sortKey($arr)
-{
-    uksort($arr, fn($a, $b) => trim($a, '+- ') <=> trim($b, '+- '));
-    return $arr;
+    return [
+        'name' => $key,
+        'type' => $type,
+        'oldValue' => $oldValue,
+        'newValue' => $newValue,
+        'children' => $children
+    ];
 }
