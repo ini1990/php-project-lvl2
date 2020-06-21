@@ -2,33 +2,39 @@
 
 namespace Differ\renderer;
 
-function rend($arr)
+function rend($ast, $depth = 0)
 {
-    $res = array_reduce($arr, function ($acc, $node) {
-        switch ($node['type']) {
-            case 'deleted':
-                $acc["- " . $node['name']] = $node['oldValue'];
-                break;
-            case 'added':
-                $acc["+ " . $node['name']] = $node['newValue'];
-                break;
-            case 'unchanged':
-                $acc["  " . $node['name']] = $node['oldValue'];
-                break;
-            case 'nested':
-                $acc[$node['name']] = rend($node['children']);
-                break;
-            case 'changed':
-                $acc["- " . $node['name']] = $node['oldValue'];
-                $acc["+ " . $node['name']] = $node['newValue'];
-                break;
-        }
+    $indent = str_repeat('    ', $depth);
+    $renderedData = array_reduce($ast, function ($acc, $node) use ($indent, $depth) {
+        $oldValue = renderValue($node['oldValue'], $depth);
+        $newValue = renderValue($node['newValue'], $depth);
+        $children = ($node['type'] == 'nested') ? rend($node['children'], $depth + 1) : '';
+        $map = ['nested' => ["{$indent}    {$node['name']}: {$children}"],
+             'unchanged' => ["{$indent}    {$node['name']}: {$newValue}"],
+             'changed' => ["{$indent}  + {$node['name']}: {$newValue}", "{$indent}  - {$node['name']}: {$oldValue}"],
+             'added' => ["{$indent}  + {$node['name']}: {$newValue}"],
+             'deleted' => ["{$indent}  - {$node['name']}: {$oldValue}"]];
+        $acc = array_merge($acc, $map[$node['type']]);
         return $acc;
-    }, []);
-    $res = json_encode($res, JSON_PRETTY_PRINT);
+    }, ["{"]);
+    return implode($renderedData, "\n") . "\n$indent}";
+}
 
-    $res = str_replace(['"+ ', '"- ', '"  '], ['+ ', '- ', '  '], $res);
-    $res = str_replace(['"', ','], '', $res);
-    $res = str_replace(['\n'], PHP_EOL, $res);
-    return $res;
+function renderValue($item, $depth)
+{
+    if (!is_object($item)) {
+        return trim(json_encode($item), '"');
+    }
+    $indent = "\n" . str_repeat('    ', $depth + 1);
+    $arr = array_keys(get_object_vars($item));
+    $renderedData = array_reduce($arr, function ($acc, $key) use ($item, $indent, $depth) {
+        if (is_object($item->$key)) {
+            $acc[] = renderValue($item->$key, $depth + 1);
+            return $acc;
+        } else {
+            $acc[] = "$indent    $key: " . trim(json_encode($item->$key), '"');
+            return $acc;
+        }
+    }, []);
+    return "{" . implode($renderedData, "\n") . "$indent}";
 }
