@@ -15,7 +15,8 @@
         "files": [
           "src/diff.php",
           "src/decoder.php",
-          "src/renderer.php"
+          "src/formatters/pretty.php",
+          "src/formatters/plain.php"
         ]
     },
     "bin": [

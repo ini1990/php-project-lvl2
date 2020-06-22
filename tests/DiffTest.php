@@ -37,10 +37,19 @@ class DiffTest extends TestCase
 
     public function testGenDiffYaml2()
     {
-        $pathToFileExpected = __DIR__ . "/fixtures/expected";
-        $pathToFileBefore = __DIR__ . "/fixtures/before.yaml";
-        $pathToFileAfter = __DIR__ . "/fixtures/after.yaml";
+        $pathToFileExpected = __DIR__ . "/fixtures/expected2";
+        $pathToFileBefore = __DIR__ . "/fixtures/before2.yaml";
+        $pathToFileAfter = __DIR__ . "/fixtures/after2.yaml";
         $expected = file_get_contents($pathToFileExpected);
         $this->assertEquals($expected, genDiff($pathToFileBefore, $pathToFileAfter));
+    }
+
+    public function testGenDiffPlain()
+    {
+        $pathToFileExpected = __DIR__ . "/fixtures/expectedPlain";
+        $pathToFileBefore = __DIR__ . "/fixtures/before2.yaml";
+        $pathToFileAfter = __DIR__ . "/fixtures/after2.yaml";
+        $expected = file_get_contents($pathToFileExpected);
+        $this->assertEquals($expected, genDiff($pathToFileBefore, $pathToFileAfter, 'plain'));
     }
 }

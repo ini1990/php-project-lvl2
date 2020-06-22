@@ -1,6 +1,6 @@
 <?php
 
-namespace Differ\renderer;
+namespace Differ\formatters\pretty;
 
 function rend($ast, $depth = 0)
 {
@@ -14,8 +14,7 @@ function rend($ast, $depth = 0)
              'changed' => ["{$indent}  + {$node['name']}: {$newValue}", "{$indent}  - {$node['name']}: {$oldValue}"],
              'added' => ["{$indent}  + {$node['name']}: {$newValue}"],
              'deleted' => ["{$indent}  - {$node['name']}: {$oldValue}"]];
-        $acc = array_merge($acc, $map[$node['type']]);
-        return $acc;
+        return array_merge($acc, $map[$node['type']]);
     }, ["{"]);
     return implode($renderedData, "\n") . "\n$indent}";
 }
