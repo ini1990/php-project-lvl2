@@ -29,3 +29,4 @@ $args = \Docopt::handle(DOC, ["version" => VERSION]);
 
 $diff = \Differ\Diff\genDiff($args["<firstFile>"], $args["<secondFile>"], $args["--format"]);
 print_r($diff);
+print_r("\n");
