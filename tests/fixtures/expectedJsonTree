@@ -1,0 +1,116 @@
+[
+    {
+        "name": "common",
+        "type": "nested",
+        "oldValue": {
+            "setting1": "Value 1",
+            "setting2": "200",
+            "setting3": true,
+            "setting6": {
+                "key": "value"
+            }
+        },
+        "newValue": {
+            "setting1": "Value 1",
+            "setting3": true,
+            "setting4": "blah blah",
+            "setting5": {
+                "key5": "value5"
+            }
+        },
+        "children": [
+            {
+                "name": "setting1",
+                "type": "unchanged",
+                "oldValue": "Value 1",
+                "newValue": "Value 1",
+                "children": []
+            },
+            {
+                "name": "setting2",
+                "type": "deleted",
+                "oldValue": "200",
+                "newValue": "",
+                "children": []
+            },
+            {
+                "name": "setting3",
+                "type": "unchanged",
+                "oldValue": true,
+                "newValue": true,
+                "children": []
+            },
+            {
+                "name": "setting6",
+                "type": "deleted",
+                "oldValue": {
+                    "key": "value"
+                },
+                "newValue": "",
+                "children": []
+            },
+            {
+                "name": "setting4",
+                "type": "added",
+                "oldValue": "",
+                "newValue": "blah blah",
+                "children": []
+            },
+            {
+                "name": "setting5",
+                "type": "added",
+                "oldValue": "",
+                "newValue": {
+                    "key5": "value5"
+                },
+                "children": []
+            }
+        ]
+    },
+    {
+        "name": "group1",
+        "type": "nested",
+        "oldValue": {
+            "baz": "bas",
+            "foo": "bar"
+        },
+        "newValue": {
+            "foo": "bar",
+            "baz": "bars"
+        },
+        "children": [
+            {
+                "name": "baz",
+                "type": "changed",
+                "oldValue": "bas",
+                "newValue": "bars",
+                "children": []
+            },
+            {
+                "name": "foo",
+                "type": "unchanged",
+                "oldValue": "bar",
+                "newValue": "bar",
+                "children": []
+            }
+        ]
+    },
+    {
+        "name": "group2",
+        "type": "deleted",
+        "oldValue": {
+            "abc": "12345"
+        },
+        "newValue": "",
+        "children": []
+    },
+    {
+        "name": "group3",
+        "type": "added",
+        "oldValue": "",
+        "newValue": {
+            "fee": "100500"
+        },
+        "children": []
+    }
+]

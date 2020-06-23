@@ -10,7 +10,7 @@ if (file_exists($autoloadPath1)) {
     require_once $autoloadPath2;
 }
 
-const VERSION = 'Gendiff v.0.0.0';
+const VERSION = 'Gendiff v.0.2.0';
 const DOC = <<<DOC
 Generate diff
 
@@ -27,5 +27,5 @@ DOC;
 
 $args = \Docopt::handle(DOC, ["version" => VERSION]);
 
-$diff = \Differ\diff\genDiff($args["<firstFile>"], $args["<secondFile>"], $args["--format"]);
+$diff = \Differ\Diff\genDiff($args["<firstFile>"], $args["<secondFile>"], $args["--format"]);
 print_r($diff);

@@ -4,7 +4,7 @@ namespace Differ\Tests;
 
 use PHPUnit\Framework\TestCase;
 
-use function Differ\diff\genDiff;
+use function Differ\Diff\genDiff;
 
 class DiffTest extends TestCase
 {
@@ -26,30 +26,48 @@ class DiffTest extends TestCase
         $this->assertEquals($expected, genDiff($pathToFileBefore, $pathToFileAfter));
     }
 
-    public function testGenDiff2()
+    public function testGenDiffTree()
     {
-        $pathToFileExpected = __DIR__ . "/fixtures/expected2";
-        $pathToFileBefore = __DIR__ . "/fixtures/before2.json";
-        $pathToFileAfter = __DIR__ . "/fixtures/after2.json";
+        $pathToFileExpected = __DIR__ . "/fixtures/expectedTree";
+        $pathToFileBefore = __DIR__ . "/fixtures/beforeTree.json";
+        $pathToFileAfter = __DIR__ . "/fixtures/afterTree.json";
         $expected = file_get_contents($pathToFileExpected);
         $this->assertEquals($expected, genDiff($pathToFileBefore, $pathToFileAfter));
     }
 
-    public function testGenDiffYaml2()
+    public function testGenDiffYamlTree()
     {
-        $pathToFileExpected = __DIR__ . "/fixtures/expected2";
-        $pathToFileBefore = __DIR__ . "/fixtures/before2.yaml";
-        $pathToFileAfter = __DIR__ . "/fixtures/after2.yaml";
+        $pathToFileExpected = __DIR__ . "/fixtures/expectedTree";
+        $pathToFileBefore = __DIR__ . "/fixtures/beforeTree.yaml";
+        $pathToFileAfter = __DIR__ . "/fixtures/afterTree.yaml";
         $expected = file_get_contents($pathToFileExpected);
         $this->assertEquals($expected, genDiff($pathToFileBefore, $pathToFileAfter));
     }
 
-    public function testGenDiffPlain()
+    public function testGenDiffYamlPlainTree()
     {
         $pathToFileExpected = __DIR__ . "/fixtures/expectedPlain";
-        $pathToFileBefore = __DIR__ . "/fixtures/before2.yaml";
-        $pathToFileAfter = __DIR__ . "/fixtures/after2.yaml";
+        $pathToFileBefore = __DIR__ . "/fixtures/beforeTree.yaml";
+        $pathToFileAfter = __DIR__ . "/fixtures/afterTree.yaml";
         $expected = file_get_contents($pathToFileExpected);
         $this->assertEquals($expected, genDiff($pathToFileBefore, $pathToFileAfter, 'plain'));
+    }
+
+    public function testGenDiffJsonFormat()
+    {
+        $pathToFileExpected = __DIR__ . "/fixtures/expectedJson";
+        $pathToFileBefore = __DIR__ . "/fixtures/before.json";
+        $pathToFileAfter = __DIR__ . "/fixtures/after.json";
+        $expected = file_get_contents($pathToFileExpected);
+        $this->assertEquals($expected, genDiff($pathToFileBefore, $pathToFileAfter, 'json'));
+    }
+
+    public function testGenDiffJsonTreeFormat()
+    {
+        $pathToFileExpected = __DIR__ . "/fixtures/expectedJsonTree";
+        $pathToFileBefore = __DIR__ . "/fixtures/beforeTree.json";
+        $pathToFileAfter = __DIR__ . "/fixtures/afterTree.json";
+        $expected = file_get_contents($pathToFileExpected);
+        $this->assertEquals($expected, genDiff($pathToFileBefore, $pathToFileAfter, 'json'));
     }
 }

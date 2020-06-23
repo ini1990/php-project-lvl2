@@ -1,20 +1,21 @@
 <?php
 
-namespace Differ\diff;
+namespace Differ\Diff;
 
-use function Differ\decoder\decode;
+use function Differ\Parsers\parse;
 
 function genDiff($file1, $file2, $format = 'pretty')
 {
-    $rend = "\Differ\\formatters\\{$format}\\rend";
-    return $rend(buildAst(decode($file1), decode($file2)));
+    $getData = fn ($file) => parse(file_get_contents(realpath($file)), pathinfo(realpath($file), PATHINFO_EXTENSION));
+    $rend = "\\Differ\\Formatters\\{$format}\\rend";
+    return $rend(makeAst($getData($file1), $getData($file2)));
 }
 
-function buildAst($data1, $data2)
+function makeAst($data1, $data2)
 {
     return array_map(function ($key) use ($data1, $data2) {
         if (is_object($data1->$key ?? '') && is_object($data2->$key ?? '')) {
-            [$type, $children] = ['nested', buildAst($data1->$key, $data2->$key)];
+            [$type, $children] = ['nested', makeAst($data1->$key, $data2->$key)];
         } elseif (!property_exists($data2, $key)) {
             $type = 'deleted';
         } elseif (!property_exists($data1, $key)) {

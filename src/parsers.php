@@ -1,14 +1,8 @@
 <?php
 
-namespace Differ\decoder;
+namespace Differ\Parsers;
 
 use Symfony\Component\Yaml\Yaml;
-
-function decode($file)
-{
-    $filePath = (strpos($file, '/') === 0) ? $file : getcwd() . '/' . $file;
-    return parse(file_get_contents($filePath), pathinfo($filePath, PATHINFO_EXTENSION));
-}
 
 function parse($data, $type)
 {
@@ -17,5 +11,8 @@ function parse($data, $type)
         'yml'  => fn($data) => Yaml::parse($data, Yaml::PARSE_OBJECT_FOR_MAP),
         'json' => fn($data) => json_decode($data)
     ];
-    return $parsers[$type]($data);
+    if (!array_key_exists(strtolower($type), $parsers)) {
+        throw new \Exception('Undefined format');
+    }
+    return $parsers[strtolower($type)]($data);
 }

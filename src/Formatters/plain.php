@@ -1,6 +1,6 @@
 <?php
 
-namespace Differ\formatters\plain;
+namespace Differ\Formatters\plain;
 
 function rend($ast, $parrent = '')
 {
@@ -13,5 +13,6 @@ function rend($ast, $parrent = '')
 
         return array_merge($acc, [($arr[$node['type']] ?? rend($node['children'], "{$parrent}{$node['name']}."))]);
     }, []);
+    
     return implode("\n", array_filter($result));
 }

@@ -1,13 +1,13 @@
 <?php
 
-namespace Differ\formatters\pretty;
+namespace Differ\Formatters\pretty;
 
 function rend($ast, $depth = 0)
 {
     $indent = str_repeat('    ', $depth);
     $renderedData = array_reduce($ast, function ($acc, $node) use ($indent, $depth) {
-        $oldValue = renderValue($node['oldValue'], $depth);
-        $newValue = renderValue($node['newValue'], $depth);
+        $oldValue = rendValue($node['oldValue'], $depth);
+        $newValue = rendValue($node['newValue'], $depth);
         $children = ($node['type'] == 'nested') ? rend($node['children'], $depth + 1) : '';
         $map = ['nested' => ["{$indent}    {$node['name']}: {$children}"],
              'unchanged' => ["{$indent}    {$node['name']}: {$newValue}"],
@@ -19,7 +19,7 @@ function rend($ast, $depth = 0)
     return implode($renderedData, "\n") . "\n$indent}";
 }
 
-function renderValue($item, $depth)
+function rendValue($item, $depth)
 {
     if (!is_object($item)) {
         return trim(json_encode($item), '"');
@@ -28,11 +28,9 @@ function renderValue($item, $depth)
     $arr = array_keys(get_object_vars($item));
     $renderedData = array_reduce($arr, function ($acc, $key) use ($item, $indent, $depth) {
         if (is_object($item->$key)) {
-            $acc[] = renderValue($item->$key, $depth + 1);
-            return $acc;
+            return array_merge($acc, [rendValue($item->$key, $depth + 1)]);
         } else {
-            $acc[] = "$indent    $key: " . trim(json_encode($item->$key), '"');
-            return $acc;
+            return array_merge($acc, ["$indent    $key: " . trim(json_encode($item->$key), '"')]);
         }
     }, []);
     return "{" . implode($renderedData, "\n") . "$indent}";

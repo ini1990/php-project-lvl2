@@ -1,5 +1,6 @@
 {
     "name": "ini1990/php-project-lvl2",
+    "description": "Generator difference between files",
     "authors": [
         {
             "name": "ini1990",
@@ -14,9 +15,10 @@
     "autoload": {
         "files": [
           "src/diff.php",
-          "src/decoder.php",
-          "src/formatters/pretty.php",
-          "src/formatters/plain.php"
+          "src/parsers.php",
+          "src/Formatters/pretty.php",
+          "src/Formatters/plain.php",
+          "src/Formatters/json.php"
         ]
     },
     "bin": [
