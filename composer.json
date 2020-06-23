@@ -1,6 +1,7 @@
 {
     "name": "ini1990/php-project-lvl2",
     "description": "Generator difference between files",
+    "license": "MIT",
     "authors": [
         {
             "name": "ini1990",

@@ -10,7 +10,7 @@ if (file_exists($autoloadPath1)) {
     require_once $autoloadPath2;
 }
 
-const VERSION = 'Gendiff v.0.2.0';
+const VERSION = 'Gendiff v.0.2.1';
 const DOC = <<<DOC
 Generate diff
 
