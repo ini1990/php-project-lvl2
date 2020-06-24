@@ -12,6 +12,8 @@ class DiffTest extends TestCase
     private $before = __DIR__ . "/fixtures/before.json";
     private $yamlBefore = __DIR__ . "/fixtures/before.yaml";
     private $yamlAfter = __DIR__ . "/fixtures/after.yaml";
+    private $undefinedBefore = __DIR__ . "/fixtures/before.html";
+    private $undefinedAfter = __DIR__ . "/fixtures/after.html";
     private $expectedPretty = __DIR__ . "/fixtures/pretty";
     private $expectedJson = __DIR__ . "/fixtures/json";
     private $expectedPlain = __DIR__ . "/fixtures/plain";
@@ -26,6 +28,13 @@ class DiffTest extends TestCase
     {
         $expected = file_get_contents($this->expectedPretty);
         $this->assertEquals($expected, genDiff($this->yamlBefore, $this->yamlAfter));
+    }
+
+    public function testExceptionFormat()
+    {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Undefined format');
+        genDiff($this->undefinedBefore, $this->undefinedAfter);
     }
 
     public function testGenDiffPlain()
