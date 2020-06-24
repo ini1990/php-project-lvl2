@@ -28,7 +28,7 @@
             },
             {
                 "name": "setting2",
-                "type": "deleted",
+                "type": "removed",
                 "oldValue": "200",
                 "newValue": "",
                 "children": []
@@ -42,7 +42,7 @@
             },
             {
                 "name": "setting6",
-                "type": "deleted",
+                "type": "removed",
                 "oldValue": {
                     "key": "value"
                 },
@@ -97,7 +97,7 @@
     },
     {
         "name": "group2",
-        "type": "deleted",
+        "type": "removed",
         "oldValue": {
             "abc": "12345"
         },

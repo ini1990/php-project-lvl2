@@ -2,7 +2,7 @@
 
 namespace Differ\Formatters\json;
 
-function rend($diff)
+function rend($ast)
 {
-    return json_encode($diff, JSON_PRETTY_PRINT);
+    return json_encode($ast, JSON_PRETTY_PRINT);
 }

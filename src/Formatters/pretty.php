@@ -13,10 +13,10 @@ function rend($ast, $depth = 0)
              'unchanged' => ["{$indent}    {$node['name']}: {$newValue}"],
              'changed' => ["{$indent}  + {$node['name']}: {$newValue}", "{$indent}  - {$node['name']}: {$oldValue}"],
              'added' => ["{$indent}  + {$node['name']}: {$newValue}"],
-             'deleted' => ["{$indent}  - {$node['name']}: {$oldValue}"]];
+             'removed' => ["{$indent}  - {$node['name']}: {$oldValue}"]];
         return array_merge($acc, $map[$node['type']]);
     }, ["{"]);
-    return implode($renderedData, "\n") . "\n$indent}";
+    return implode("\n", $renderedData) . "\n$indent}";
 }
 
 function rendValue($item, $depth)
@@ -33,5 +33,5 @@ function rendValue($item, $depth)
             return array_merge($acc, ["$indent    $key: " . trim(json_encode($item->$key), '"')]);
         }
     }, []);
-    return "{" . implode($renderedData, "\n") . "$indent}";
+    return "{" . implode("\n", $renderedData) . "$indent}";
 }
