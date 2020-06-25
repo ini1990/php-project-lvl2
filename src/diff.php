@@ -14,14 +14,14 @@ function genDiff($file1, $file2, $format = 'pretty')
 function makeAst($data1, $data2)
 {
     return array_map(function ($key) use ($data1, $data2) {
-        if (is_object($data1->$key ?? '') && is_object($data2->$key ?? '')) {
-            [$type, $children] = ['nested', makeAst($data1->$key, $data2->$key)];
-        } elseif (!property_exists($data2, $key)) {
+        if (!property_exists($data2, $key)) {
             $type = 'removed';
         } elseif (!property_exists($data1, $key)) {
             $type = 'added';
         } elseif ($data2->$key === $data1->$key) {
             $type = 'unchanged';
+        } elseif (is_object($data1->$key) && is_object($data2->$key)) {
+            [$type, $children] = ['nested', makeAst($data1->$key, $data2->$key)];
         } else {
             $type = 'changed';
         }

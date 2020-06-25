@@ -8,44 +8,30 @@ use function Differ\Diff\genDiff;
 
 class DiffTest extends TestCase
 {
-    private $after = __DIR__ . "/fixtures/after.json";
-    private $before = __DIR__ . "/fixtures/before.json";
-    private $yamlBefore = __DIR__ . "/fixtures/before.yaml";
-    private $yamlAfter = __DIR__ . "/fixtures/after.yaml";
-    private $undefinedBefore = __DIR__ . "/fixtures/before.html";
-    private $undefinedAfter = __DIR__ . "/fixtures/after.html";
-    private $expectedPretty = __DIR__ . "/fixtures/pretty";
-    private $expectedJson = __DIR__ . "/fixtures/json";
-    private $expectedPlain = __DIR__ . "/fixtures/plain";
-
-    public function testGenDiff()
+    private $dir = __DIR__ . "//fixtures//";
+    
+    /** @return array ['input', 'expected'] */
+    public function genDiffProvider()
     {
-        $expected = file_get_contents($this->expectedPretty);
-        $this->assertEquals($expected, genDiff($this->before, $this->after));
+        return [
+            ['before.json', 'after.json', 'pretty', 'pretty'],
+            ['before.yaml', 'after.yaml', 'pretty', 'pretty'],
+            ['before.json', 'after.json', 'plain', 'plain'],
+            ['before.json', 'after.json', 'json', 'json']
+        ];
     }
 
-    public function testGenDiffYaml()
+    /** @dataProvider genDiffProvider */
+    public function testDiffer($before, $after, $format, $expected)
     {
-        $expected = file_get_contents($this->expectedPretty);
-        $this->assertEquals($expected, genDiff($this->yamlBefore, $this->yamlAfter));
+        $result = file_get_contents($this->dir . $expected);
+        $this->assertEquals($result, genDiff($this->dir . $before, $this->dir . $after, $format));
     }
 
     public function testExceptionFormat()
     {
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Undefined format');
-        genDiff($this->undefinedBefore, $this->undefinedAfter);
-    }
-
-    public function testGenDiffPlain()
-    {
-        $expected = file_get_contents($this->expectedPlain);
-        $this->assertEquals($expected, genDiff($this->before, $this->after, 'plain'));
-    }
-
-    public function testGenDiffJson()
-    {
-        $expected = file_get_contents($this->expectedJson);
-        $this->assertEquals($expected, genDiff($this->before, $this->after, 'json'));
+        genDiff($this->dir . 'before.html', $this->dir . 'after.html');
     }
 }
