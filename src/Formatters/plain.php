@@ -2,7 +2,7 @@
 
 namespace Differ\Formatters\plain;
 
-function rend($ast, $parrent = '')
+function render($ast, $parrent = '')
 {
     $result = array_reduce($ast, function ($acc, $node) use ($parrent) {
         $rendValue = fn ($str) => is_object($node[$str]) ? 'complex value' : trim(json_encode($node[$str]), '"');
@@ -10,7 +10,7 @@ function rend($ast, $parrent = '')
         $arr = ['added' => $rendText(" with value: '{$rendValue('newValue')}'"),
             'removed' => $rendText(''),
             'changed' => $rendText(". From '{$rendValue('oldValue')}' to '{$rendValue('newValue')}'")];
-        return array_merge($acc, [($arr[$node['type']] ?? rend($node['children'], "{$parrent}{$node['name']}."))]);
+        return array_merge($acc, [($arr[$node['type']] ?? render($node['children'], "{$parrent}{$node['name']}."))]);
     }, []);
     
     return implode("\n", array_filter($result));

@@ -12,7 +12,7 @@ function parse($data, $type)
         'json' => fn($data) => json_decode($data)
     ];
     if (!array_key_exists(strtolower($type), $parsers)) {
-        throw new \Exception('Undefined format');
+        throw new \Exception("Undefined format: {$type}");
     }
     return $parsers[strtolower($type)]($data);
 }
