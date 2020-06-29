@@ -31,7 +31,7 @@ class DiffTest extends TestCase
     public function testExceptionFormat()
     {
         $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('Undefined format');
+        $this->expectExceptionMessage('Unknown format');
         genDiff($this->dir . 'before.html', $this->dir . 'after.html');
     }
 }

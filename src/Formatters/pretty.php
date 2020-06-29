@@ -2,36 +2,49 @@
 
 namespace Differ\Formatters\pretty;
 
-function render($ast, $depth = 0)
+function render($tree)
 {
-    $indent = str_repeat('    ', $depth);
-    $renderedData = array_reduce($ast, function ($acc, $node) use ($indent, $depth) {
-        $oldValue = renderValue($node['oldValue'], $depth);
-        $newValue = renderValue($node['newValue'], $depth);
-        $children = ($node['type'] == 'nested') ? render($node['children'], $depth + 1) : '';
-        $map = ['nested' => "{$indent}    {$node['name']}: {$children}",
-             'unchanged' => "{$indent}    {$node['name']}: {$newValue}",
-             'changed' => "{$indent}  + {$node['name']}: {$newValue}\n{$indent}  - {$node['name']}: {$oldValue}",
-             'added' => "{$indent}  + {$node['name']}: {$newValue}",
-             'removed' => "{$indent}  - {$node['name']}: {$oldValue}"];
-        return array_merge($acc, [$map[$node['type']]]);
-    }, ["{"]);
-    return implode("\n", $renderedData) . "\n$indent}";
+    return renderTree($tree);
 }
 
-function renderValue($item, $depth)
+function renderTree($tree, $depth = 0)
 {
-    if (!is_object($item)) {
-        return trim(json_encode($item), '"');
+    $indent = str_repeat('    ', $depth);
+    $renderedData = array_reduce($tree, fn ($acc, $node) => array_merge($acc, renderNode($node, $depth)), []);
+    return "{\n{$indent}" . implode("\n{$indent}", $renderedData) . "\n{$indent}}";
+}
+
+function renderNode($node, $depth)
+{
+    extract($node);
+    switch ($node['type'] ?? '') {
+        case "unchanged":
+            $acc[] = sprintf('%3s %s: %s', " ", $name,  renderValue($oldValue, $depth + 1));
+            break;
+        case "added":
+            $acc[] = sprintf('%3s %s: %s', "+", $name,  renderValue($newValue, $depth + 1));
+            break;
+        case "removed":
+            $acc[] = sprintf('%3s %s: %s', "-", $name,  renderValue($oldValue, $depth + 1));
+            break;
+        case "changed":
+            $acc[] = sprintf("%3s %s: %s", "+", $name,  renderValue($newValue, $depth + 1));
+            $acc[] = sprintf('%3s %s: %s', "-", $name,  renderValue($oldValue, $depth + 1));
+            break;
+        case "nested":
+            $acc[] = sprintf('%3s %s: %s', " ", $name,  renderTree($children, $depth + 1));
+            break;
+        default:
+            $acc[] = sprintf('%3s %s: %s', " ", key($node),  current($node));
     }
-    $indent = "\n" . str_repeat('    ', $depth + 1);
-    $arr = array_keys(get_object_vars($item));
-    $renderedData = array_reduce($arr, function ($acc, $key) use ($item, $indent, $depth) {
-        if (is_object($item->$key)) {
-            return array_merge($acc, [renderValue($item->$key, $depth + 1)]);
-        } else {
-            return array_merge($acc, ["$indent    $key: " . trim(json_encode($item->$key), '"')]);
-        }
-    }, []);
-    return "{" . implode("\n", $renderedData) . "$indent}";
+    return $acc;
+}
+
+function renderValue($data, $depth)
+{
+    if (!is_array($data)) {
+        return trim(json_encode($data), '"');
+    } else {
+        return renderTree(array_chunk($data, 1, true), $depth);
+    }
 }

@@ -9,33 +9,24 @@ function genDiff($filePath1, $filePath2, $format = 'pretty')
     $render = "\\Differ\\Formatters\\{$format}\\render";
     $getExtension = fn ($filePath) => pathinfo(realpath($filePath), PATHINFO_EXTENSION);
     $getData = fn ($filePath) => parse(file_get_contents(realpath($filePath)), $getExtension($filePath));
-
     return $render(buildTree($getData($filePath1), $getData($filePath2)));
 }
 
 function buildTree($data1, $data2)
 {
-    $allKey = array_unique(array_keys((array) $data1 + (array) $data2));
-
-    return array_map(function ($key) use ($data1, $data2) {
-        if (!property_exists($data2, $key)) {
-            return makeNode($key, 'removed', $data1->$key);
-        } elseif (!property_exists($data1, $key)) {
-            return makeNode($key, 'added', '', $data2->$key);
+    $allKeys = array_unique(array_keys($data1 + $data2));
+    return array_map(function ($name) use ($data1, $data2) {
+        $makeNode = fn ($type, $opt) => ['name' => $name, 'type' => $type] + $opt;
+        if (!key_exists($name, $data2)) {
+            return $makeNode('removed', ['oldValue' => $data1[$name]]);
+        } elseif (!key_exists($name, $data1)) {
+            return $makeNode('added', ['newValue' => $data2[$name]]);
         } else {
-            [$oldValue, $newValue] = [$data1->$key, $data2->$key];
-            if (is_object($oldValue) && is_object($newValue)) {
-                $children = buildTree($oldValue, $newValue);
-                return makeNode($key, 'nested', $oldValue, $newValue, $children);
-            } else {
-                $type = ($oldValue === $newValue) ? 'unchanged' : 'changed';
-                return makeNode($key, $type, $oldValue, $newValue);
+            if (is_array($data1[$name]) && is_array($data2[$name])) {
+                return $makeNode('nested', ['children' => buildTree($data1[$name], $data2[$name])]);
             }
+            $type = ($data1[$name] === $data2[$name]) ? 'unchanged' : 'changed';
+            return $makeNode($type, ['oldValue' => $data1[$name], 'newValue' => $data2[$name]]);
         }
-    }, $allKey);
-}
-
-function makeNode($name, $type, $oldValue = '', $newValue = '', $children = [])
-{
-    return compact('name', 'type', 'oldValue', 'newValue', 'children');
+    }, $allKeys);
 }
