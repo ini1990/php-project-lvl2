@@ -19,23 +19,23 @@ function renderNode($node, $depth)
     extract($node);
     switch ($node['type'] ?? '') {
         case "unchanged":
-            $acc[] = sprintf('%3s %s: %s', " ", $name,  renderValue($oldValue, $depth + 1));
+            $acc[] = sprintf('%3s %s: %s', " ", $name, renderValue($oldValue, $depth + 1));
             break;
         case "added":
-            $acc[] = sprintf('%3s %s: %s', "+", $name,  renderValue($newValue, $depth + 1));
+            $acc[] = sprintf('%3s %s: %s', "+", $name, renderValue($newValue, $depth + 1));
             break;
         case "removed":
-            $acc[] = sprintf('%3s %s: %s', "-", $name,  renderValue($oldValue, $depth + 1));
+            $acc[] = sprintf('%3s %s: %s', "-", $name, renderValue($oldValue, $depth + 1));
             break;
         case "changed":
-            $acc[] = sprintf("%3s %s: %s", "+", $name,  renderValue($newValue, $depth + 1));
-            $acc[] = sprintf('%3s %s: %s', "-", $name,  renderValue($oldValue, $depth + 1));
+            $acc[] = sprintf("%3s %s: %s", "+", $name, renderValue($newValue, $depth + 1));
+            $acc[] = sprintf('%3s %s: %s', "-", $name, renderValue($oldValue, $depth + 1));
             break;
         case "nested":
-            $acc[] = sprintf('%3s %s: %s', " ", $name,  renderTree($children, $depth + 1));
+            $acc[] = sprintf('%3s %s: %s', " ", $name, renderTree($children, $depth + 1));
             break;
         default:
-            $acc[] = sprintf('%3s %s: %s', " ", key($node),  current($node));
+            $acc[] = sprintf('%3s %s: %s', " ", key($node), current($node));
     }
     return $acc;
 }
