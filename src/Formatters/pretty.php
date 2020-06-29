@@ -10,23 +10,23 @@ function render($tree)
 function renderTree($tree, $depth = 0)
 {
     $indent = str_repeat('    ', $depth);
-    $renderedData = array_reduce($tree, fn ($acc, $node) => array_merge($acc, renderNode($node, $depth)), []);
+    $renderedData = array_reduce($tree, fn ($acc, $node) => array_merge($acc, formatNode($node, $depth)), []);
     return "{\n{$indent}" . implode("\n{$indent}", $renderedData) . "\n{$indent}}";
 }
 
-function renderNode($node, $depth)
+function formatNode($node, $depth)
 {
     extract($node);
     switch ($type) {
         case "unchanged":
-            return getText(' ', $name, renderValue($oldValue, $depth));
+            return getText(' ', $name, formatValue($oldValue, $depth));
         case "added":
-            return getText('+', $name, renderValue($newValue, $depth));
+            return getText('+', $name, formatValue($newValue, $depth));
         case "removed":
-            return getText('-', $name, renderValue($oldValue, $depth));
+            return getText('-', $name, formatValue($oldValue, $depth));
         case "changed":
-            $arr = getText('+', $name, renderValue($newValue, $depth));
-            return array_merge($arr, getText('-', $name, renderValue($oldValue, $depth)));
+            $arr = getText('+', $name, formatValue($newValue, $depth));
+            return array_merge($arr, getText('-', $name, formatValue($oldValue, $depth)));
         case "nested":
             return getText(' ', $name, renderTree($children, $depth + 1));
         case 'array':
@@ -37,7 +37,7 @@ function renderNode($node, $depth)
     }
 }
 
-function renderValue($data, $depth)
+function formatValue($data, $depth)
 {
     if (is_array($data)) {
         $arr = $data + ['type' => 'array'];
