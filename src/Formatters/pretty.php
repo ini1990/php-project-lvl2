@@ -17,34 +17,29 @@ function renderTree($tree, $depth = 0)
 function renderNode($node, $depth)
 {
     extract($node);
-    switch ($node['type'] ?? '') {
+    switch ($type) {
         case "unchanged":
-            $acc[] = sprintf('%3s %s: %s', " ", $name, renderValue($oldValue, $depth + 1));
-            break;
+            return getText(' ', $name, renderValue($oldValue, $depth));
         case "added":
-            $acc[] = sprintf('%3s %s: %s', "+", $name, renderValue($newValue, $depth + 1));
-            break;
+            return getText('+', $name, renderValue($newValue, $depth));
         case "removed":
-            $acc[] = sprintf('%3s %s: %s', "-", $name, renderValue($oldValue, $depth + 1));
-            break;
+            return getText('-', $name, renderValue($oldValue, $depth));
         case "changed":
-            $acc[] = sprintf("%3s %s: %s", "+", $name, renderValue($newValue, $depth + 1));
-            $acc[] = sprintf('%3s %s: %s', "-", $name, renderValue($oldValue, $depth + 1));
-            break;
+            $arr = getText('+', $name, renderValue($newValue, $depth));
+            return array_merge($arr, getText('-', $name, renderValue($oldValue, $depth)));
         case "nested":
-            $acc[] = sprintf('%3s %s: %s', " ", $name, renderTree($children, $depth + 1));
-            break;
+            return getText(' ', $name, renderTree($children, $depth + 1));
         default:
-            $acc[] = sprintf('%3s %s: %s', " ", key($node), current($node));
+            return getText(" ", key($node), current($node));
     }
-    return $acc;
 }
 
 function renderValue($data, $depth)
 {
-    if (!is_array($data)) {
-        return trim(json_encode($data), '"');
-    } else {
-        return renderTree(array_chunk($data, 1, true), $depth);
-    }
+    return is_array($data) ? renderTree(array_chunk($data, 1, true), $depth + 1) : trim(json_encode($data), '"');
+}
+
+function getText($sign, $key, $value)
+{
+    return [sprintf('%3s %s: %s', $sign, $key, $value)];
 }
