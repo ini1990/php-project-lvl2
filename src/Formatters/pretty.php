@@ -29,14 +29,22 @@ function renderNode($node, $depth)
             return array_merge($arr, getText('-', $name, renderValue($oldValue, $depth)));
         case "nested":
             return getText(' ', $name, renderTree($children, $depth + 1));
-        default:
+        case 'array':
             return getText(" ", key($node), current($node));
+            break;
+        default:
+            throw new \Exception("Unknown type: '{$node['type']}'!");
     }
 }
 
 function renderValue($data, $depth)
 {
-    return is_array($data) ? renderTree(array_chunk($data, 1, true), $depth + 1) : trim(json_encode($data), '"');
+    if (is_array($data)) {
+        $arr = $data + ['type' => 'array'];
+        return renderTree(array_chunk($arr, 2, true), $depth + 1);
+    } else {
+        return trim(json_encode($data), '"');
+    }
 }
 
 function getText($sign, $key, $value)
