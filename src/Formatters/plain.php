@@ -7,15 +7,15 @@ function render($tree)
     return iter($tree);
 }
 
-function iter($tree, $parrent = '')
+function iter($tree, $parent = '')
 {
-    $result = array_reduce($tree, fn ($acc, $node) => array_merge($acc, [generateText($node, $parrent)]), []);
+    $result = array_map(fn ($node) => generateText($node, $parent), $tree);
     return implode("\n", array_filter($result));
 }
 
-function generateText($node, $parrent)
+function generateText($node, $parent)
 {
-    $name = ltrim("{$parrent}.{$node['name']}", '.');
+    $name = $parent . $node['name'];
     $format = fn ($value) => is_array($value) ? 'complex value' : trim(json_encode($value), '"');
     switch ($node['type']) {
         case 'removed':
@@ -28,7 +28,7 @@ function generateText($node, $parrent)
         case 'unchanged':
             break;
         case 'nested':
-            return iter($node['children'], $name);
+            return iter($node['children'], $name . '.');
         default:
             throw new \Exception("Unknown type: '{$node['type']}'!");
     }

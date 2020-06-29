@@ -2,6 +2,8 @@
 
 namespace Differ\Formatters\pretty;
 
+use function Funct\Collection\flatten;
+
 function render($tree)
 {
     return renderTree($tree);
@@ -10,26 +12,25 @@ function render($tree)
 function renderTree($tree, $depth = 0)
 {
     $indent = str_repeat('    ', $depth);
-    $renderedData = array_reduce($tree, fn ($acc, $node) => array_merge($acc, formatNode($node, $depth)), []);
+    $renderedData = flatten(array_map(fn ($node) => formatNode($node, $depth), $tree));
     return "{\n{$indent}" . implode("\n{$indent}", $renderedData) . "\n{$indent}}";
 }
 
 function formatNode($node, $depth)
 {
-    extract($node);
-    switch ($type) {
+    switch ($node['type']) {
         case "unchanged":
-            return getText(' ', $name, formatValue($oldValue, $depth));
+            return getText(' ', $node['name'], formatValue($node['oldValue'], $depth));
         case "added":
-            return getText('+', $name, formatValue($newValue, $depth));
+            return getText('+', $node['name'], formatValue($node['newValue'], $depth));
         case "removed":
-            return getText('-', $name, formatValue($oldValue, $depth));
+            return getText('-', $node['name'], formatValue($node['oldValue'], $depth));
         case "changed":
-            $arr = getText('+', $name, formatValue($newValue, $depth));
-            return array_merge($arr, getText('-', $name, formatValue($oldValue, $depth)));
+            return  [getText('+', $node['name'], formatValue($node['newValue'], $depth)),
+                    getText('-', $node['name'], formatValue($node['oldValue'], $depth))];
         case "nested":
-            return getText(' ', $name, renderTree($children, $depth + 1));
-        case 'array':
+            return getText(' ', $node['name'], renderTree($node['children'], $depth + 1));
+        case 'itemsToFormat':
             return getText(" ", key($node), current($node));
             break;
         default:
@@ -40,14 +41,13 @@ function formatNode($node, $depth)
 function formatValue($data, $depth)
 {
     if (is_array($data)) {
-        $arr = $data + ['type' => 'array'];
-        return renderTree(array_chunk($arr, 2, true), $depth + 1);
-    } else {
-        return trim(json_encode($data), '"');
+        $items = array_merge($data, ['type' => 'itemsToFormat']);
+        return renderTree(array_chunk($items, 2, true), $depth + 1);
     }
+    return trim(json_encode($data), '"');
 }
 
 function getText($sign, $key, $value)
 {
-    return [sprintf('%3s %s: %s', $sign, $key, $value)];
+    return sprintf('%3s %s: %s', $sign, $key, $value);
 }

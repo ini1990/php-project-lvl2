@@ -2,6 +2,7 @@
 
 namespace Differ\Diff;
 
+use function Funct\Collection\union;
 use function Differ\Parsers\parse;
 
 function genDiff($filePath1, $filePath2, $format = 'pretty')
@@ -14,7 +15,7 @@ function genDiff($filePath1, $filePath2, $format = 'pretty')
 
 function buildTree($data1, $data2)
 {
-    $allKeys = array_unique(array_keys($data1 + $data2));
+    $allKeys = union(array_keys($data1), array_keys($data2));
     return array_map(function ($name) use ($data1, $data2) {
         $makeNode = fn ($type, $opt) => ['name' => $name, 'type' => $type] + $opt;
         if (!key_exists($name, $data2)) {
