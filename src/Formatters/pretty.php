@@ -2,7 +2,7 @@
 
 namespace Differ\Formatters\pretty;
 
-use function Funct\Collection\flatten;
+use Funct\Collection;
 
 function render($tree)
 {
@@ -12,12 +12,15 @@ function render($tree)
 function renderTree($tree, $depth = 0)
 {
     $indent = str_repeat('    ', $depth);
-    $renderedData = flatten(array_map(fn ($node) => formatNode($node, $depth), $tree));
+    $renderedData = Collection\flatten(array_map(fn ($node) => formatNode($node, $depth), $tree));
     return "{\n{$indent}" . implode("\n{$indent}", $renderedData) . "\n{$indent}}";
 }
 
 function formatNode($node, $depth)
 {
+    if (!key_exists('type', $node)) {
+        return getText(" ", key($node), current($node));
+    }
     switch ($node['type']) {
         case "unchanged":
             return getText(' ', $node['name'], formatValue($node['oldValue'], $depth));
@@ -30,9 +33,6 @@ function formatNode($node, $depth)
                     getText('-', $node['name'], formatValue($node['oldValue'], $depth))];
         case "nested":
             return getText(' ', $node['name'], renderTree($node['children'], $depth + 1));
-        case 'itemsToFormat':
-            return getText(" ", key($node), current($node));
-            break;
         default:
             throw new \Exception("Unknown type: '{$node['type']}'!");
     }
@@ -41,8 +41,7 @@ function formatNode($node, $depth)
 function formatValue($data, $depth)
 {
     if (is_array($data)) {
-        $items = array_merge($data, ['type' => 'itemsToFormat']);
-        return renderTree(array_chunk($items, 2, true), $depth + 1);
+        return renderTree(array_chunk($data, 1, true), $depth + 1);
     }
     return trim(json_encode($data), '"');
 }
