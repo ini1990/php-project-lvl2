@@ -20,7 +20,7 @@ Options:
   --format <fmt>                Report format [default: pretty]
 ```
 
-`gendiff after.json befor.json`
+`gendiff after.json before.json`
 
 [![asciicast](https://asciinema.org/a/wbZMrfASKoSTJTTOzKLCOVjrR.svg)](https://asciinema.org/a/wbZMrfASKoSTJTTOzKLCOVjrR)
 
