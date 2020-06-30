@@ -37,7 +37,7 @@ function stringify($key, $data, $depth = 0, $sign = ' ')
     if (is_bool($data)) {
         $data = ($data) ? 'true' : 'false';
     } elseif (is_array($data)) {
-        $indent = str_repeat('    ', ++$depth);
+        $indent = str_repeat('    ', $depth + 1);
         $renderedData = array_map(fn($item) => stringify(array_search($item, $data), $item), $data);
         $data = "{\n{$indent}" . implode("\n{$indent}", $renderedData) . "\n{$indent}}";
     }
