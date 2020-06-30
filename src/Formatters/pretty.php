@@ -2,7 +2,7 @@
 
 namespace Differ\Formatters\pretty;
 
-use Funct\Collection;
+use function Funct\Collection\flatten;
 
 function render($tree)
 {
@@ -12,19 +12,19 @@ function render($tree)
 function renderTree($tree, $depth = 0)
 {
     $indent = str_repeat('    ', $depth);
-    $renderedData = Collection\flatten(array_map(function ($node) use ($depth) {
+    $renderedData = flatten(array_map(function ($node) use ($depth) {
         switch ($node['type']) {
             case "unchanged":
-                return stringify(' ', $node['name'], formatValue($node['oldValue'], $depth));
+                return stringify($node['name'], $node['oldValue'], $depth);
             case "added":
-                return stringify('+', $node['name'], formatValue($node['newValue'], $depth));
+                return stringify($node['name'], $node['newValue'], $depth, '+');
             case "removed":
-                return stringify('-', $node['name'], formatValue($node['oldValue'], $depth));
+                return stringify($node['name'], $node['oldValue'], $depth, '-');
             case "changed":
-                return  [stringify('+', $node['name'], formatValue($node['newValue'], $depth)),
-                stringify('-', $node['name'], formatValue($node['oldValue'], $depth))];
+                return  [stringify($node['name'], $node['newValue'], $depth, '+'),
+                stringify($node['name'], $node['oldValue'], $depth, '-')];
             case "nested":
-                return stringify(' ', $node['name'], renderTree($node['children'], $depth + 1));
+                return stringify($node['name'], renderTree($node['children'], $depth + 1), $depth);
             default:
                 throw new \Exception("Unknown type: '{$node['type']}'!");
         }
@@ -32,17 +32,14 @@ function renderTree($tree, $depth = 0)
     return "{\n{$indent}" . implode("\n{$indent}", $renderedData) . "\n{$indent}}";
 }
 
-function formatValue($data, $depth)
+function stringify($key, $data, $depth = 0, $sign = ' ')
 {
-    if (is_array($data)) {
+    if (is_bool($data)) {
+        $data = ($data) ? 'true' : 'false';
+    } elseif (is_array($data)) {
         $indent = str_repeat('    ', ++$depth);
-        $renderedData = array_map(fn($node) => stringify(' ', key($node), current($node)), array_chunk($data, 1, true));
-        return "{\n{$indent}" . implode("\n{$indent}", $renderedData) . "\n{$indent}}";
+        $renderedData = array_map(fn($item) => stringify(array_search($item, $data), $item), $data);
+        $data = "{\n{$indent}" . implode("\n{$indent}", $renderedData) . "\n{$indent}}";
     }
-    return trim(json_encode($data), '"');
-}
-
-function stringify($sign, $key, $value)
-{
-    return sprintf('%3s %s: %s', $sign, $key, $value);
+    return sprintf('%3s %s: %s', $sign, $key, $data);
 }
